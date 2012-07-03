@@ -3,11 +3,11 @@ package org.zeroxlab.demo;
 import org.zeroxlab.widget.AnimationLayout;
 
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.os.Bundle;
-import android.widget.*;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 public class MainActivity extends Activity implements AnimationLayout.Listener {
     public final static String TAG = "Demo";

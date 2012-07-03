@@ -23,13 +23,11 @@ import org.zeroxlab.demo.R;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.MeasureSpec;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 
 public class AnimationLayout extends ViewGroup {
 
