@@ -20,6 +20,11 @@ public class AnimationLayoutGesturesListener extends GestureDetector.SimpleOnGes
 	
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
+		
+		if(!this.layout.isOpening()){
+			return false;
+		}
+		
 		View content = this.layout.getContentView();
 		float x = e.getX();
 		float y = e.getY();
