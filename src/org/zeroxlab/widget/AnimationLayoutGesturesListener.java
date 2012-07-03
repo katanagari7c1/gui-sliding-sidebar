@@ -1,16 +1,21 @@
 package org.zeroxlab.widget;
 
+import org.zeroxlab.widget.AnimationLayout;
+
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 
 
 public class AnimationLayoutGesturesListener extends GestureDetector.SimpleOnGestureListener{
+	private ViewConfiguration viewConfiguration;
 	private AnimationLayout layout;
 	
-	public AnimationLayoutGesturesListener(AnimationLayout animationLayout) {
+	public AnimationLayoutGesturesListener(AnimationLayout animationLayout, ViewConfiguration viewConfiguration) {
 		super();
 		this.layout = animationLayout;
+		this.viewConfiguration = viewConfiguration;
 	}
 	
 	@Override
@@ -32,15 +37,18 @@ public class AnimationLayoutGesturesListener extends GestureDetector.SimpleOnGes
 	
 	@Override
 	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-
-		if(e1.getY() - e2.getY() > 0){
+		int scrollSlop = this.viewConfiguration.getScaledTouchSlop();
+		
+		float scrollDelta = e1.getY() - e2.getY();
+		
+		if(scrollDelta > scrollSlop){
 			this.layout.openSidebar();
 		}
-		else if (e1.getY() - e2.getY() == 0){
-			return false;
+		else if (scrollDelta < -scrollSlop){
+			this.layout.closeSidebar();
 		}
 		else {
-			this.layout.closeSidebar();
+			return false;
 		}
 
 		return true;

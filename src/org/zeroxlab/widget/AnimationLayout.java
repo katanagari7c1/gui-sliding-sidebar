@@ -26,6 +26,7 @@ import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
@@ -56,7 +57,7 @@ public class AnimationLayout extends ViewGroup {
 
     public AnimationLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.gestureListener = new AnimationLayoutGesturesListener(this);
+        this.gestureListener = new AnimationLayoutGesturesListener(this, ViewConfiguration.get(context));
         this.gestureDetector = new GestureDetector(getContext(), this.gestureListener);
     }
 
