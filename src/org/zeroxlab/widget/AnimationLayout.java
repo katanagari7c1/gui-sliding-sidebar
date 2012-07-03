@@ -23,6 +23,7 @@ import org.zeroxlab.demo.R;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,18 +32,21 @@ import android.view.animation.TranslateAnimation;
 
 public class AnimationLayout extends ViewGroup {
 
-    public final static int DURATION = 500;
+    public final static int DURATION = 250;
 
     protected boolean mOpened;
     protected View mSidebar;
     protected View mContent;
-    protected int mSidebarWidth = 150; /* assign default value. It will be overwrite
+    protected int mSidebarHeight = 150; /* assign default value. It will be overwrite
                                           in onMeasure by Layout xml resource. */
 
     protected Animation mAnimation;
     protected OpenListener    mOpenListener;
     protected CloseListener   mCloseListener;
     protected Listener mListener;
+    
+    protected GestureDetector gestureDetector;
+    protected AnimationLayoutGesturesListener gestureListener;
 
     protected boolean mPressed = false;
 
@@ -52,6 +56,8 @@ public class AnimationLayout extends ViewGroup {
 
     public AnimationLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
+        this.gestureListener = new AnimationLayoutGesturesListener(this);
+        this.gestureDetector = new GestureDetector(getContext(), this.gestureListener);
     }
 
     @Override
@@ -75,11 +81,11 @@ public class AnimationLayout extends ViewGroup {
     @Override
     public void onLayout(boolean changed, int l, int t, int r, int b) {
         /* the title bar assign top padding, drop it */
-        mSidebar.layout(l, 0, l + mSidebarWidth, 0 + mSidebar.getMeasuredHeight());
+        mSidebar.layout(l, b - mSidebarHeight , r, b);
         if (mOpened) {
-            mContent.layout(l + mSidebarWidth, 0, r + mSidebarWidth, b);
+            mContent.layout(l, -mSidebarHeight, r, b - mSidebarHeight);
         } else {
-            mContent.layout(l, 0, r, b);
+            mContent.layout(l, t , r, b);
         }
     }
 
@@ -87,16 +93,16 @@ public class AnimationLayout extends ViewGroup {
     public void onMeasure(int w, int h) {
         super.onMeasure(w, h);
         super.measureChildren(w, h);
-        mSidebarWidth = mSidebar.getMeasuredWidth();
+        mSidebarHeight = mSidebar.getMeasuredHeight();
     }
 
     @Override
     protected void measureChild(View child, int parentWSpec, int parentHSpec) {
         /* the max width of Sidebar is 90% of Parent */
         if (child == mSidebar) {
-            int mode = MeasureSpec.getMode(parentWSpec);
-            int width = (int)(getMeasuredWidth() * 0.9);
-            super.measureChild(child, MeasureSpec.makeMeasureSpec(width, mode), parentHSpec);
+            int mode = MeasureSpec.getMode(parentHSpec);
+            int height = (int)(getMeasuredHeight() * 0.9);
+            super.measureChild(child, parentWSpec, MeasureSpec.makeMeasureSpec(height, mode));
         } else {
             super.measureChild(child, parentWSpec, parentHSpec);
         }
@@ -104,41 +110,7 @@ public class AnimationLayout extends ViewGroup {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        if (!isOpening()) {
-            return false;
-        }
-
-        int action = ev.getAction();
-
-        if (action != MotionEvent.ACTION_UP
-                && action != MotionEvent.ACTION_DOWN) {
-            return false;
-        }
-
-        /* if user press and release both on Content while
-         * sidebar is opening, call listener. otherwise, pass
-         * the event to child. */
-        int x = (int)ev.getX();
-        int y = (int)ev.getY();
-        if (mContent.getLeft() < x
-                && mContent.getRight() > x
-                && mContent.getTop() < y
-                && mContent.getBottom() > y) {
-            if (action == MotionEvent.ACTION_DOWN) {
-                mPressed = true;
-            }
-
-            if (mPressed
-                    && action == MotionEvent.ACTION_UP
-                    && mListener != null) {
-                mPressed = false;
-                return mListener.onContentTouchedWhenOpening();
-            }
-        } else {
-            mPressed = false;
-        }
-
-        return false;
+    	return this.gestureDetector.onTouchEvent(ev);
     }
 
     public void setListener(Listener l) {
@@ -157,11 +129,11 @@ public class AnimationLayout extends ViewGroup {
 
         if (mOpened) {
             /* opened, make close animation*/
-            mAnimation = new TranslateAnimation(0, -mSidebarWidth, 0, 0);
+            mAnimation = new TranslateAnimation(0, 0, 0, mSidebarHeight);
             mAnimation.setAnimationListener(mCloseListener);
         } else {
             /* not opened, make open animation */
-            mAnimation = new TranslateAnimation(0, mSidebarWidth, 0, 0);
+            mAnimation = new TranslateAnimation(0, 0, 0, -mSidebarHeight);
             mAnimation.setAnimationListener(mOpenListener);
         }
         mAnimation.setDuration(DURATION);
@@ -232,7 +204,15 @@ public class AnimationLayout extends ViewGroup {
             }
         }
     }
-
+    
+    public View getContentView(){
+    	return this.mContent;
+    }
+    
+    public View getSidebarView(){
+    	return this.mSidebar;
+    }
+    
     public interface Listener {
         public void onSidebarOpened();
         public void onSidebarClosed();
