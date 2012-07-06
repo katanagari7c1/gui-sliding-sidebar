@@ -86,7 +86,7 @@ public class AnimationLayout extends ViewGroup {
         if (mOpened) {
             mContent.layout(l, -mSidebarHeight, r, b - mSidebarHeight);
         } else {
-            mContent.layout(l, t , r, b);
+            mContent.layout(l, 0 , r, b);
         }
     }
 
