@@ -82,11 +82,12 @@ public class AnimationLayout extends ViewGroup {
     @Override
     public void onLayout(boolean changed, int l, int t, int r, int b) {
         /* the title bar assign top padding, drop it */
-        mSidebar.layout(l, b - mSidebarHeight , r, b);
+    	int contentHeight = b - t;
+        mSidebar.layout(l, contentHeight - mSidebarHeight , r, b);
         if (mOpened) {
-            mContent.layout(l, -mSidebarHeight, r, b - mSidebarHeight);
+            mContent.layout(l, -mSidebarHeight, r, contentHeight - mSidebarHeight);
         } else {
-            mContent.layout(l, 0 , r, b);
+            mContent.layout(l, 0 , r, contentHeight);
         }
     }
 
